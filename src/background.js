@@ -28,3 +28,31 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
 });
+var tab;
+var updated = false;
+var layerSrc;
+chrome.webRequest.onCompleted.addListener(function (details) {
+  if(details.responseHeaders) {
+    details.responseHeaders.forEach(i => {
+      if(i.name !== "Content-Type") return;
+      if(!i.value.includes("application/xml")) return;
+      console.log(details);
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        tab = tabs[0].id;
+        layerSrc = details.url;
+        let url = chrome.runtime.getURL("templates/mapml-viewer.html");
+        chrome.tabs.update(tab, {active: true, url: url}, function (tab) {
+          updated = true;
+        });
+      });
+    });
+  }
+}, {urls: ["<all_urls>"]}, ["responseHeaders"]);
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if(updated && tab.status === "complete") {
+    updated = false;
+    chrome.tabs.sendMessage(tabId, {msg: "add-layer", url: layerSrc});
+  }
+});
+

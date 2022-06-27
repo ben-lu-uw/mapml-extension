@@ -35,6 +35,22 @@ document.addEventListener("readystatechange", () => {
  * Removes the map-options element from the document head after it's been used
  */
 document.addEventListener("DOMContentLoaded", () => {
+  if(!document.head) return;
   let mapOptions = document.head.querySelector("map-options");
   if (mapOptions) document.head.removeChild(mapOptions);
 }, {once: true});
+
+
+chrome.runtime.onMessage.addListener(
+    function (message) {
+      if(message.msg !== "add-layer") return;
+      let map = document.querySelector("body > mapml-viewer");
+      let layer = document.createElement("layer-");
+      layer.src = message.url;
+      layer.checked = true;
+      map.appendChild(layer);
+      setTimeout(function () {
+          layer.focus();
+      });
+    }
+);
