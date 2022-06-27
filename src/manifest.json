@@ -10,7 +10,8 @@
     "geolocation",
     "notifications",
     "webRequest",
-    "tabs"
+    "tabs",
+    "webNavigation"
   ],
   "web_accessible_resources": [
     {"resources" : ["templates/*"],

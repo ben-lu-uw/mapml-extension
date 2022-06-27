@@ -49,8 +49,9 @@ chrome.runtime.onMessage.addListener(
       layer.src = message.url;
       layer.checked = true;
       map.appendChild(layer);
+      //Slight delay needed for more consistency in successfully "focusing" the layer
       setTimeout(function () {
           layer.focus();
-      });
+      }, 100);
     }
 );

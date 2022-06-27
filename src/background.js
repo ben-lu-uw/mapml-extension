@@ -49,10 +49,16 @@ chrome.webRequest.onCompleted.addListener(function (details) {
   }
 }, {urls: ["<all_urls>"]}, ["responseHeaders"]);
 
+chrome.webNavigation.onCommitted.addListener(function (details) {
+  let url = chrome.runtime.getURL("templates/mapml-viewer.html");
+  console.log(details)
+  if((details.transitionType === "reload" || details.transitionQualifiers[0] === "forward_back")
+      && details.url === url) updated = true;
+});
+
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if(updated && tab.status === "complete") {
     updated = false;
     chrome.tabs.sendMessage(tabId, {msg: "add-layer", url: layerSrc});
   }
 });
-
