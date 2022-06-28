@@ -44,11 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
 chrome.runtime.onMessage.addListener(
     function (message) {
       if(message.msg !== "add-layer") return;
-      let map = document.querySelector("body > mapml-viewer");
-      let layer = document.createElement("layer-");
+      let layer = document.querySelector("layer-")
       layer.src = message.url;
       layer.checked = true;
-      map.appendChild(layer);
       //Slight delay needed for more consistency in successfully "focusing" the layer
       setTimeout(function () {
           layer.focus();

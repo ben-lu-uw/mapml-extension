@@ -36,7 +36,6 @@ chrome.webRequest.onCompleted.addListener(function (details) {
     details.responseHeaders.forEach(i => {
       if(i.name !== "Content-Type") return;
       if(!i.value.includes("application/xml")) return;
-      console.log(details);
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         tab = tabs[0].id;
         layerSrc = details.url;
@@ -51,7 +50,6 @@ chrome.webRequest.onCompleted.addListener(function (details) {
 
 chrome.webNavigation.onCommitted.addListener(function (details) {
   let url = chrome.runtime.getURL("templates/mapml-viewer.html");
-  console.log(details)
   if((details.transitionType === "reload" || details.transitionQualifiers[0] === "forward_back")
       && details.url === url) updated = true;
 });
