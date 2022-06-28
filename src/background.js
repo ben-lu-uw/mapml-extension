@@ -28,7 +28,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
 });
-var tab;
+
 var updated = false;
 var layerSrc;
 chrome.webRequest.onCompleted.addListener(function (details) {
@@ -37,11 +37,14 @@ chrome.webRequest.onCompleted.addListener(function (details) {
       if(i.name !== "Content-Type") return;
       if(!i.value.includes("application/xml")) return;
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        tab = tabs[0].id;
+        let tab = tabs[0].id;
+        if(details.tabId !== tab) tab = details.tabId;
         layerSrc = details.url;
         let url = chrome.runtime.getURL("templates/mapml-viewer.html");
-        chrome.tabs.update(tab, {active: true, url: url}, function (tab) {
-          updated = true;
+        setTimeout(function () {
+          chrome.tabs.update(tab, {url: url}, function () {
+            updated = true;
+          });
         });
       });
     });
