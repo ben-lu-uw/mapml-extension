@@ -29,35 +29,57 @@ chrome.runtime.onInstalled.addListener(() => {
 
 });
 
+//webRequest.onCompleted -> isXML -> tabs.onUpdated -> checkForMapml -> updateURL -> tabs.onUpdated -> updated -> content.js
 var updated = false;
+var isXML = false;
 var layerSrc;
+var request;
+
+function updateURL() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    let tab = tabs[0].id;
+    if(request.tabId !== tab) tab = request.tabId;
+    layerSrc = request.url;
+    let url = chrome.runtime.getURL("templates/mapml-viewer.html");
+    setTimeout(function () {
+      chrome.tabs.update(tab, {url: url}, function () {
+        updated = true;
+      });
+    });
+  });
+}
+
 chrome.webRequest.onCompleted.addListener(function (details) {
   if(details.responseHeaders) {
     details.responseHeaders.forEach(i => {
       if(i.name !== "Content-Type") return;
       if(!i.value.includes("application/xml")) return;
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        let tab = tabs[0].id;
-        if(details.tabId !== tab) tab = details.tabId;
-        layerSrc = details.url;
-        let url = chrome.runtime.getURL("templates/mapml-viewer.html");
-        setTimeout(function () {
-          chrome.tabs.update(tab, {url: url}, function () {
-            updated = true;
-          });
-        });
-      });
+      request = details
+      isXML = true;
     });
   }
 }, {urls: ["<all_urls>"]}, ["responseHeaders"]);
 
+//Regenerates map on reload and forward/back navigation
 chrome.webNavigation.onCommitted.addListener(function (details) {
   let url = chrome.runtime.getURL("templates/mapml-viewer.html");
   if((details.transitionType === "reload" || details.transitionQualifiers[0] === "forward_back")
       && details.url === url) updated = true;
 });
 
+function checkForMapml() {
+  let mapml = document.querySelector("mapml-");
+  return (mapml !== null);
+}
+
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if(isXML && tab.status === "complete") {
+    isXML = false;
+    chrome.scripting.executeScript({target: {tabId: tabId}, func: checkForMapml},
+        (results) => {
+          if(results[0].result) updateURL();
+        });
+  }
   if(updated && tab.status === "complete") {
     updated = false;
     chrome.tabs.sendMessage(tabId, {msg: "add-layer", url: layerSrc});
