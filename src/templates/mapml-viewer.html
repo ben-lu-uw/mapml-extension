@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Title</title>
     <script type="module" src="dist/mapml-viewer.js"></script>
     <script src="../content.js"></script>
 </head>
 <body>
-    <mapml-viewer style="height: 600px;width:500px;" projection="CBMTILE" zoom="0" lat="47" lon="-92" controls>
+    <!--Map size is not properly set if stylesheet link is in head-->
+    <link rel="stylesheet" href="global.css">
+    <mapml-viewer projection="CBMTILE" controls>
         <layer-></layer->
     </mapml-viewer>
 </body>

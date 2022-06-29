@@ -13,10 +13,6 @@
     "tabs",
     "webNavigation"
   ],
-  "web_accessible_resources": [
-    {"resources" : ["templates/*"],
-    "matches" :  ["<all_urls>"]}
-  ],
   "host_permissions" : [
     "<all_urls>"
   ],
