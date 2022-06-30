@@ -32,13 +32,17 @@ chrome.runtime.onInstalled.addListener(() => {
 //webRequest.onCompleted -> isXML -> tabs.onUpdated -> checkForMapml -> updateURL -> tabs.onUpdated -> updated -> content.js
 var updated = false;
 var isXML = false;
+var openInNewTab = false;
 var layerSrc = {};
 var request;
 
 function updateURL() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     let tab = tabs[0].id;
-    if(request.tabId !== tab) tab = request.tabId;
+    if(request.tabId !== tab) {
+      openInNewTab = true
+      tab = request.tabId;
+    }
     layerSrc[tab] = request.url;
     let url = chrome.runtime.getURL("templates/mapml-viewer.html");
     setTimeout(function () {
@@ -84,6 +88,10 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     updated = false;
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       let tab = tabs[0].id;
+      if(openInNewTab) {
+        openInNewTab = false;
+        tab = request.tabId;
+      }
       let src = layerSrc[tab];
       chrome.tabs.sendMessage(tabId, {msg: "add-layer", url: src});
     });
