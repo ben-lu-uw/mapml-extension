@@ -57,11 +57,23 @@ chrome.webRequest.onCompleted.addListener(function (details) {
   if(details.responseHeaders) {
     details.responseHeaders.forEach(i => {
       if(i.name !== "Content-Type") return;
+      /*
+       TODO: handle text/mapml requests
+       Use details.type to weed out the text/mapml responses generated from our own mapml.js:
+       either details.type !== "xmlhttprequest" or details.type === "main_frame"
+      */
+      /*
+      if(i.value.includes("text/mapml") && details.type !== "xmlhttprequest") {
+        request = details;
+        //Maybe move this to chrome.tabs.onUpdated
+        updateURL();
+      }
+      */
       if(!i.value.includes("application/xml")) return;
       chrome.storage.local.get("options", function (result) {
         let generateMap = result.options ? result.options.generateMap : false;
         if(generateMap) {
-          request = details
+          request = details;
           isXML = true;
         }
       });
