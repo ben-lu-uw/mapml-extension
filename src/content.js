@@ -50,6 +50,8 @@ chrome.runtime.onMessage.addListener(
       //Slight delay needed for more consistency in successfully "focusing" the layer
       setTimeout(function () {
           layer.focus();
+          let title = document.querySelector("title");
+          title.innerText = layer.label;
       }, 100);
     }
 );
