@@ -58,8 +58,13 @@ chrome.webRequest.onCompleted.addListener(function (details) {
     details.responseHeaders.forEach(i => {
       if(i.name !== "Content-Type") return;
       if(!i.value.includes("application/xml")) return;
-      request = details
-      isXML = true;
+      chrome.storage.local.get("options", function (result) {
+        let generateMap = result.options ? result.options.generateMap : false;
+        if(generateMap) {
+          request = details
+          isXML = true;
+        }
+      });
     });
   }
 }, {urls: ["<all_urls>"]}, ["responseHeaders"]);
