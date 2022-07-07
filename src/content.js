@@ -47,11 +47,10 @@ chrome.runtime.onMessage.addListener(
       let layer = document.querySelector("layer-")
       layer.src = message.url;
       layer.checked = true;
-      //Slight delay needed for more consistency in successfully "focusing" the layer
-      setTimeout(function () {
+      layer.addEventListener("extentload", function () {
           layer.focus();
           let title = document.querySelector("title");
           title.innerText = layer.label;
-      }, 100);
+      })
     }
 );
