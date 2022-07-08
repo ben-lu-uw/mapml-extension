@@ -1,18 +1,9 @@
-var CryptoJS = require("crypto-js");
+const calculateID = require("../calculateID")
 describe("Popup test", () => {
     beforeAll(async () => {
-        //Calculate unpacked extension id
         let path = process.cwd();
         let os = await page.evaluate(() => navigator.userAgent);
-        let encode = CryptoJS.enc.Utf16LE.parse(path + "\\src" );
-        if(os.indexOf("Windows") === -1) encode = CryptoJS.enc.Utf8.parse(path + "/src");
-        let hash = CryptoJS.SHA256(encode);
-        let digest = hash.toString(CryptoJS.enc.Hex);
-        let id = [];
-        for(let i in digest){
-            id.push(String.fromCharCode(parseInt(digest[i], 16) + 97));
-        }
-        id = id.join('').substr(0, 32);
+        let id = calculateID(path, os);
         await page.goto('chrome-extension://' + id +'/popup.html');
     });
 
@@ -21,9 +12,10 @@ describe("Popup test", () => {
     });
 
     test("Turn on options", async ()=>{
-        await page.keyboard.press("Tab");
-        await page.waitForTimeout(500);
-
+        for(let i = 0; i < 2; i++){
+            await page.keyboard.press("Tab");
+            await page.waitForTimeout(500);
+        }
         for(let i = 0; i < 2; i++){
             await page.keyboard.press("Tab");
             await page.waitForTimeout(500);
